@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
@@ -55,7 +55,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = (props: LoginProps) => {
-  const { open, onClose, onRegister } = props; 
+  const { open, onClose, onRegister } = props;
 
   const [, dispatch] = useStateContext();
 
@@ -66,6 +66,27 @@ const Login: React.FC<LoginProps> = (props: LoginProps) => {
     }
   });
 
+  useEffect(() => {
+    const users = JSON.parse(window.localStorage.getItem('users') || "[]");
+    const user = JSON.parse(window.localStorage.getItem('user') || "{}");
+
+    const userExist = users.some((curUser: any) => curUser.id === user?.id);
+
+    if (userExist) {
+      dispatch({
+        type: "SET_USER",
+        payload: {
+          value: user,
+        }
+      })
+    } else {
+      if (user) {
+        window.localStorage.removeItem('user');
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleOnSubmit(values: Record<string, any>) {
     const users = JSON.parse(window.localStorage.getItem("users") || "[]");
     const findedUser = users.find((user: any) => user.email === values.email);
@@ -75,6 +96,8 @@ const Login: React.FC<LoginProps> = (props: LoginProps) => {
     } else {
       if (values.password === findedUser.password) {
         alert('Login successfully');
+
+        window.localStorage.setItem('user', JSON.stringify(findedUser));
 
         dispatch({
           type: "SET_USER",

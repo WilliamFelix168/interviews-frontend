@@ -1,24 +1,26 @@
-import { Box, Grid, Typography } from '@material-ui/core';
-import React from 'react';
+import React, { useEffect } from 'react';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Grow from '@material-ui/core/Grow';
+import Typography from '@material-ui/core/Typography';
 import styles from './list.module.css';
-import iphoneProto from '../../assets/images/iphone-proto2.png';
 import Detail from '../../components/product/detail';
+import CancelIcon from '@material-ui/icons/Cancel';
 import { useHistory } from 'react-router';
+import { useStateContext } from '../../context';
+import { ProductProps } from '../../context/reducer';
 
-interface ListItemProps {
-  name?: string;
-  img?: string;
-  price?: string;
+interface ListItemProps extends ProductProps {
   onClick?: () => void;
 }
 
 const ListItem: React.FC<ListItemProps> = (props: ListItemProps) => {
-  const { name, img, price, onClick } = props;
+  const { name, photo, onClick } = props;
   return (
-    <Grid item md={4} lg={4} xs={true} onClick={onClick}>
+    <Grid item md={4} lg={4} xs={4} onClick={onClick}>
       <Box className={styles.listItem}>
         <Box width="100%" className={styles.listItemImg}>
-          <img src={img} alt="" />
+          <img src={photo} width="100%" alt="" />
         </Box>
         <Box
           display="flex"
@@ -28,58 +30,77 @@ const ListItem: React.FC<ListItemProps> = (props: ListItemProps) => {
           <Typography>
             {name}
           </Typography>
-          <Typography>
-            {price}
-          </Typography>
         </Box>
       </Box>
     </Grid>
   )
 }
 
-const mockData = [
-  { id: 1, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-  { id: 2, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-  { id: 3, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-  { id: 4, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-  { id: 5, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-  { id: 6, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-  { id: 7, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-  { id: 8, name: 'Iphone X', price: 'Rp. 14.500.000', img: iphoneProto },
-]
-
 const List: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const history = useHistory();
 
+  const [{ products }, dispatch] = useStateContext();
+
+  useEffect(() => {
+    const savedProducts = JSON.parse(window.localStorage.getItem('products') || "[]");
+
+    if (savedProducts.length > 0) {
+      dispatch({
+        type: "SET_PRODUCTS",
+        payload: {
+          value: savedProducts,
+        }
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <div className={styles.searchResult}>
-          <Typography variant="h4" gutterBottom>
-            {`Results for "${urlParams.get('search')}"`}
-          </Typography>
-        </div>
+        <Grow
+          in={!!urlParams.get('search')}
+          mountOnEnter
+          unmountOnExit
+        >
+          <div className={styles.searchResult}>
+            <Typography variant="h4" gutterBottom>
+              {`Results for "${urlParams.get('search')}"`}
+            </Typography>
+          </div>
+        </Grow>
         <Grid container spacing={2} className={styles.list}>
           {
-            mockData.map((row, key) => (
-              <ListItem
-                key={key}
-                name={row.name}
-                img={row.img}
-                price={row.price}
-                onClick={() => {
-                  urlParams.set('product', row.id.toString());
-                  history.push({
-                    search: urlParams.toString(),
-                  })
-                }}
-              />
-            ))
+            (products.length === 0)
+              ? (
+                <Grid item md={true} xs={true}>
+                  <Box display="flex" flexDirection="column" alignItems="center">
+                    <CancelIcon style={{ fontSize: 32, marginBottom: '1rem' }} color="action" />
+                    <Typography align="center" variant="h4">No Products Found</Typography>
+                  </Box>
+                </Grid>
+              )
+              : products.filter(
+                row => row.name?.toLocaleLowerCase().includes(urlParams.get('search')?.toLocaleLowerCase() || '')
+              ).map((row, key) => (
+                <ListItem
+                  key={key}
+                  id={row.id}
+                  name={row.name}
+                  photo={row.photo} 
+                  onClick={() => {
+                    urlParams.set('product', row.id.toString());
+                    history.push({
+                      search: urlParams.toString(),
+                    })
+                  }}
+                />
+              ))
           }
         </Grid>
       </div>
-      <Detail/>
+      <Detail />
     </div>
   )
 }

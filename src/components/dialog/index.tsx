@@ -14,22 +14,23 @@ interface DialogProps {
   footer?: ReactChild;
   title?: string;
   onClose?: () => void;
+  fullWidth?: boolean;
 }
 
 const Dialog: React.FC<DialogProps> = (props: DialogProps) => {
-  const { open, title = "", onClose, children, footer } = props;
-  
+  const { open, title = "", onClose, children, footer, fullWidth = true } = props;
+
   return (
-    <MuiDialog disableBackdropClick open={open} onClose={onClose} fullWidth>
+    <MuiDialog disableBackdropClick open={open} onClose={onClose} fullWidth={fullWidth}>
       <DialogTitle disableTypography className={styles.dialogTitle}>
         <Typography variant="h3">
           {title}
         </Typography>
         <IconButton size="small" onClick={onClose}>
-          <CloseIcon fontSize="small"/>
+          <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <Divider/>
+      <Divider />
       <DialogContent>
         {children}
       </DialogContent>

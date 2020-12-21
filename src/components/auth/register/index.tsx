@@ -55,19 +55,22 @@ const Register: React.FC<RegisterProps> = (props: RegisterProps) => {
 
     if (index !== -1) {
       alert("Email already been taken");
+    } else if (values.password !== values['retype-password']) {
+      alert('Password mismatch!');
     }
     else {
+      const id = (users.length + 1).toString();
       users.push({
+        id,
         name: values.name,
         email: values.email,
         password: values.password,
       })
 
+      window.localStorage.setItem("users", JSON.stringify(users));
       alert('Register Successfully!');
+      onLogin();
     }
-
-    window.localStorage.setItem("users", JSON.stringify(users));
-    
   }
 
   return (

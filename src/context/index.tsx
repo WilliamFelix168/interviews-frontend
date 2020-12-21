@@ -1,10 +1,10 @@
-import React, { createContext, ReactChild, useContext, useReducer } from 'react';
+import React, { createContext, Dispatch, ReactChild, useContext, useReducer } from 'react';
 import { ActionProps, InitialValueProps } from './reducer'
 
 const StateContext = createContext<React.ComponentState>([]);
 
-export const useStateContext = () => useContext(StateContext)
-
+export const useStateContext = ():
+[InitialValueProps, Dispatch<ActionProps>] => useContext(StateContext);
 interface ProviderProps {
   reducer: (state: InitialValueProps, action: ActionProps) => InitialValueProps;
   initialValue: InitialValueProps;

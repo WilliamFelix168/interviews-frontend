@@ -7,12 +7,20 @@ export interface ActionProps {
   payload: PayloadProps;
 }
 
+export interface ProductProps {
+  id: string;
+  name?: string;
+  description?: string;
+  photo?: string;
+}
 export interface InitialValueProps {
-  user?: any;
+  user: any;
+  products: ProductProps[];
 }
 
 export const initialValue: InitialValueProps = {
   user: null,
+  products: [],
 }
 
 function Reducer(
@@ -26,6 +34,15 @@ function Reducer(
       return {
         ...state,
         user: value
+      }
+    }
+
+    case "SET_PRODUCTS": {
+      const { value } = action.payload;
+
+      return {
+        ...state,
+        products: value
       }
     }
 

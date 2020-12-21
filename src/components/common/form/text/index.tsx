@@ -17,6 +17,7 @@ interface TextFieldProps {
   required?: boolean;
   InputProps?: InputProps;
   fullWidth?: boolean;
+  multiline?: boolean;
   noMarginBottom?: boolean;
 }
 
@@ -27,6 +28,7 @@ const TextField: React.FC<TextFieldProps> = (props) => {
     labelOptions, control,
     required, InputProps,
     fullWidth, noMarginBottom,
+    multiline,
   } = props;
   const [show, setShow] = useState(false);
 
@@ -52,6 +54,9 @@ const TextField: React.FC<TextFieldProps> = (props) => {
       <Controller
         fullWidth={fullWidth}
         required={required}
+        multiline={multiline}
+        rows={4}
+        rowsMax={5}
         control={control}
         as={MuiTextField}
         placeholder={placeholder}

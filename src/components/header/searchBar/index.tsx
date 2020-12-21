@@ -17,8 +17,8 @@ const SearchBar: React.FC = () => {
 
   function handleOnSubmit(values: Record<string, any>) {
     history.push({
-      pathname: '/list',
-      search: `search=${values.search}`,
+      pathname: '/explore',
+      search: `search=${values.search.toLowerCase()}`,
     })
   }
 

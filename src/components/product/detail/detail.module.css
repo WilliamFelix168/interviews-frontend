@@ -1,0 +1,8 @@
+.textarea {
+  width: 100%;
+  direction: ltr;
+  display: block;
+  box-sizing: border-box;
+  resize: none;
+  border: none;
+}

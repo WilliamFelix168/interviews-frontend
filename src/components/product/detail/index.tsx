@@ -1,23 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import { useHistory } from 'react-router';
-import iphoneProto from '../../../assets/images/iphone-proto3.png';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import { useHistory, useLocation } from 'react-router';
 import ShareIcon from '@material-ui/icons/Share';
-import { Box, Button, Typography } from '@material-ui/core';
+// import styles from './detail.module.css';
+import { ProductProps } from '../../../context/reducer';
+import { useStateContext } from '../../../context';
+import { TextField } from '@material-ui/core';
+import Link from '../link';
 
 const Detail: React.FC = () => {
-  const urlParams = new URLSearchParams(window.location.search);
 
   const history = useHistory();
 
-  const product = urlParams.get('product');
+  const location = useLocation()
+
+  const [{ products }] = useStateContext();
+
+  const [open, setOpen] = useState(false);
+
+  const [product, setProduct] = useState<ProductProps | null>(null);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const productId = urlParams.get('product');
+    const findedProduct = products.find(row => row.id === productId);
+
+    if (findedProduct) {
+      setProduct(findedProduct);
+    } else {
+      setProduct(null);
+    }
+
+  }, [location.search, products]);
 
   function handleClose() {
+    const urlParams = new URLSearchParams(location.search);
     urlParams.delete('product');
     history.push({
       search: urlParams.toString(),
     })
+  }
+
+  function handleCloseLink() {
+    setOpen(false);
   }
 
   return (
@@ -29,9 +58,9 @@ const Detail: React.FC = () => {
     >
       <DialogContent>
         <Box display="flex">
-          <Box display="flex" flex="70" flexDirection="column">
-            <Box width="100%">
-              <img width="100%" style={{ objectFit: 'contain' }} src={iphoneProto} alt="" />
+          <Box display="flex" flex="65" flexDirection="column">
+            <Box width="100%" borderRadius={8} overflow="hidden">
+              <img width="100%" style={{ objectFit: 'contain' }} src={product?.photo} alt="" />
             </Box>
             <Box
               display="flex"
@@ -40,32 +69,35 @@ const Detail: React.FC = () => {
               padding="1rem"
             >
               <Typography variant="h3">
-                Iphone X
+                {product?.name}
               </Typography>
-              <Button>
-                <ShareIcon/>
-                Share for 3D Model
+              <Button onClick={() => setOpen(true)}>
+                <ShareIcon fontSize="small" />
+                <span style={{ marginLeft: '.5rem' }}>Share for 3D Model</span>
               </Button>
             </Box>
           </Box>
-          <Box flex="30" padding="1rem">
-            <Typography align="justify">
-              *** BACA INI SEBELUM MEMBELI ****
-              - Produk Original Bekas Garansi Internasional
-              - Fungsional Normal Beserta fitur nya Tidak Minus
-              - Mulus 96%-98% (like New)
-              - LCD dan casing masih original pabrik
-              - 100% BISA Semua SIM Operator INDO
-              - iCloud aman 100%
-              - Imei BOX dan mesin COCOK 100%
-              - Garansi personal 1 minggu ( tukar baru )
-              - Kelengkapan OEM (Dus,Kabel,Adpt,HF)
-              - Kelengkapan HF ORI
-              (khusus iP 7 – 8 – X -Xs )
-            </Typography>
+          <Box flex="35" padding="1rem" pr="0" pt="0">
+            <TextField
+              fullWidth
+              size="small"
+              disabled
+              multiline
+              InputProps={{
+                style: {
+                  fontSize: 14
+                }
+              }}
+              rowsMax={15}
+              value={product?.description}
+            />
           </Box>
         </Box>
       </DialogContent>
+      <Link
+        open={open}
+        onClose={handleCloseLink}
+      />
     </Dialog>
   )
 }

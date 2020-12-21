@@ -26,7 +26,7 @@ function App() {
               />
               <Route
                 exact
-                path={"/list"}
+                path={"/explore"}
                 component={List}
               />
               <Route

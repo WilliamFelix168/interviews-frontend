@@ -33,6 +33,7 @@ const theme = createMuiTheme({
     }, 
     MuiTypography: {
       root: {
+        fontFamily: "'Open Sans', sans-serif!important",
         fontSize: 14,
       },
       body1: {
